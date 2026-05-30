@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>South Park Character Network</title>
+    <link rel="stylesheet" href="style.css?v=17">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>South Park Network</h1>
+            <div class="controls">
+                <button id="toggle-leaderboard" class="control-btn"><span class="icon">🏆</span> Ljestvica</button>
+                <button id="btn-compare-mode" class="control-btn"><span class="icon">⚖️</span> Usporedi</button>
+                <input type="text" id="search" placeholder="Search character...">
+            </div>
+        </header>
+        
+        <main>
+            <aside id="leaderboard-sidebar" class="hidden">
+                <button id="close-leaderboard">&times;</button>
+                <div id="leaderboard-content">
+                    <h2>Ljestvica važnosti</h2>
+                    <div id="leaderboard-list">
+                        <!-- Loaded dynamically via JS -->
+                    </div>
+                </div>
+            </aside>
+            
+            <div id="legend" class="legend-container">
+                <div class="legend-group">
+                    <button class="legend-item" data-relation="Family"><span class="dot family"></span> Obitelj</button>
+                    <button class="legend-item" data-relation="Romance"><span class="dot romance"></span> Romantika</button>
+                    <button class="legend-item" data-relation="Friend"><span class="dot friend"></span> Prijatelj</button>
+                    <button class="legend-item" data-relation="Enemy"><span class="dot enemy"></span> Neprijatelj</button>
+                    <button class="legend-item" data-relation="Work"><span class="dot work"></span> Kolega</button>
+                    <button class="legend-item" data-relation="School"><span class="dot school"></span> Škola</button>
+                </div>
+                
+                <div class="legend-separator"></div>
+                
+                <div class="filter-group">
+                    <button id="btn-filter-kids" class="filter-btn"><span class="icon">👦</span> Djeca</button>
+                    <button id="btn-filter-adults" class="filter-btn"><span class="icon">👨</span> Odrasli</button>
+                </div>
+            </div>
+            <div id="cy"></div>
+            
+            <aside id="sidebar" class="hidden">
+                <button id="close-sidebar">&times;</button>
+                <div id="character-info">
+                    <img id="char-image" src="" alt="Character Icon">
+                    <h2 id="char-name">Name</h2>
+                    <div class="badges">
+                        <span id="char-category" class="badge">Category</span>
+                    </div>
+                    
+                    <div class="sidebar-tabs">
+                        <button class="sidebar-tab-btn active" data-tab="tab-bio">Biografija</button>
+                        <button class="sidebar-tab-btn" data-tab="tab-network">Mreža</button>
+                    </div>
+                    
+                    <div id="tab-bio" class="sidebar-tab-content active">
+                        <div class="details">
+                            <p><strong>Age:</strong> <span id="char-age">-</span></p>
+                            <p><strong>Gender:</strong> <span id="char-gender">-</span></p>
+                            <p><strong>Occupation:</strong> <span id="char-occupation">-</span></p>
+                            <p><strong>First Appearance:</strong> <span id="char-first">-</span></p>
+                        </div>
+                    </div>
+                    
+                    <div id="tab-network" class="sidebar-tab-content">
+                        <div class="stats-section">
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <span class="stat-label">🏆 Rang</span>
+                                    <span id="char-rank" class="stat-val">-</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-label">🔗 Veze</span>
+                                    <span id="char-connections" class="stat-val">-</span>
+                                </div>
+                            </div>
+                            <div class="stat-full-card">
+                                <span class="stat-label">⚡ Najvažnija veza</span>
+                                <span id="char-top-conn" class="stat-val">-</span>
+                            </div>
+                            
+                            <div class="centrality-section">
+                                <h4>Socijalna središnjica</h4>
+                                <div class="centrality-item">
+                                    <div class="centrality-meta">
+                                        <span class="centrality-title">🚀 Društveni utjecaj (PageRank)</span>
+                                        <span id="centrality-pagerank-val" class="centrality-val">0%</span>
+                                    </div>
+                                    <div class="centrality-bar-bg">
+                                        <div id="centrality-pagerank-fill" class="centrality-bar-fill" style="width: 0%"></div>
+                                    </div>
+                                    <p class="centrality-desc">Mjeri popularnost lika na temelju utjecaja njegovih kontakata.</p>
+                                </div>
+                                <div class="centrality-item">
+                                    <div class="centrality-meta">
+                                        <span class="centrality-title">🌉 Društveni most (Betweenness)</span>
+                                        <span id="centrality-betweenness-val" class="centrality-val">0%</span>
+                                    </div>
+                                    <div class="centrality-bar-bg">
+                                        <div id="centrality-betweenness-fill" class="centrality-bar-fill" style="width: 0%"></div>
+                                    </div>
+                                    <p class="centrality-desc">Mjeri koliko lik služi kao poveznica između različitih grupa.</p>
+                                </div>
+                                <div class="centrality-item">
+                                    <div class="centrality-meta">
+                                        <span class="centrality-title">📢 Društvena bliskost (Closeness)</span>
+                                        <span id="centrality-closeness-val" class="centrality-val">0%</span>
+                                    </div>
+                                    <div class="centrality-bar-bg">
+                                        <div id="centrality-closeness-fill" class="centrality-bar-fill" style="width: 0%"></div>
+                                    </div>
+                                    <p class="centrality-desc">Mjeri koliko brzo informacije od ovog lika mogu stići do svih ostalih.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="breakdown-container">
+                                <h4>Struktura veza</h4>
+                                <div id="char-breakdown" class="breakdown-list">
+                                    <!-- Loaded dynamically -->
+                                </div>
+                            </div>
+                            
+                            <div class="neighbors-container">
+                                <h4>Izravne veze</h4>
+                                <div id="char-neighbors" class="neighbors-list">
+                                    <!-- Loaded dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+            
+            <div id="comparison-info" class="hidden">
+                    <div class="compare-header">
+                        <div class="compare-char" id="compare-char-a">
+                            <img class="compare-avatar" src="https://ui-avatars.com/api/?name=%3F&background=1e293b&color=f8fafc&size=128" alt="" onerror="this.src='https://ui-avatars.com/api/?name=%3F&background=1e293b&color=f8fafc&size=128'">
+                            <span class="compare-name">Odaberi lika A</span>
+                        </div>
+                        <div class="compare-vs">VS</div>
+                        <div class="compare-char" id="compare-char-b">
+                            <img class="compare-avatar" src="https://ui-avatars.com/api/?name=%3F&background=1e293b&color=f8fafc&size=128" alt="" onerror="this.src='https://ui-avatars.com/api/?name=%3F&background=1e293b&color=f8fafc&size=128'">
+                            <span class="compare-name">Odaberi lika B</span>
+                        </div>
+                    </div>
+                    
+                    <div class="compare-section path-section">
+                        <h4>Najbrža poveznica</h4>
+                        <div id="compare-path-chain" class="path-chain">
+                            <div class="path-placeholder">Odaberi dva lika za prikaz najkraće putanje.</div>
+                        </div>
+                    </div>
+
+                    <div class="compare-section">
+                        <h4>Zajedničke veze</h4>
+                        <div id="compare-mutual-list" class="neighbors-tags">
+                            <div class="path-placeholder">Nema zajedničkih veza.</div>
+                        </div>
+                    </div>
+
+                    <div class="compare-section">
+                        <h4>Usporedba statistike</h4>
+                        <div class="compare-stats-grid">
+                            <div class="compare-stat-row">
+                                <div class="stat-name">🚀 Društveni utjecaj</div>
+                                <div class="stat-bars">
+                                    <div class="compare-bar-a-bg"><div id="compare-pr-a" class="compare-fill-a" style="width: 0%"></div></div>
+                                    <div class="compare-bar-b-bg"><div id="compare-pr-b" class="compare-fill-b" style="width: 0%"></div></div>
+                                </div>
+                                <div class="stat-vals">
+                                    <span id="compare-pr-a-val">0%</span>
+                                    <span id="compare-pr-b-val">0%</span>
+                                </div>
+                            </div>
+                            <div class="compare-stat-row">
+                                <div class="stat-name">🌉 Društveni most</div>
+                                <div class="stat-bars">
+                                    <div class="compare-bar-a-bg"><div id="compare-bc-a" class="compare-fill-a" style="width: 0%"></div></div>
+                                    <div class="compare-bar-b-bg"><div id="compare-bc-b" class="compare-fill-b" style="width: 0%"></div></div>
+                                </div>
+                                <div class="stat-vals">
+                                    <span id="compare-bc-a-val">0%</span>
+                                    <span id="compare-bc-b-val">0%</span>
+                                </div>
+                            </div>
+                            <div class="compare-stat-row">
+                                <div class="stat-name">📢 Društvena bliskost</div>
+                                <div class="stat-bars">
+                                    <div class="compare-bar-a-bg"><div id="compare-cc-a" class="compare-fill-a" style="width: 0%"></div></div>
+                                    <div class="compare-bar-b-bg"><div id="compare-cc-b" class="compare-fill-b" style="width: 0%"></div></div>
+                                </div>
+                                <div class="stat-vals">
+                                    <span id="compare-cc-a-val">0%</span>
+                                    <span id="compare-cc-b-val">0%</span>
+                                </div>
+                            </div>
+                            <div class="compare-stat-row">
+                                <div class="stat-name">🔗 Ukupno veza</div>
+                                <div class="stat-bars">
+                                    <div class="compare-bar-a-bg"><div id="compare-deg-a" class="compare-fill-a" style="width: 0%"></div></div>
+                                    <div class="compare-bar-b-bg"><div id="compare-deg-b" class="compare-fill-b" style="width: 0%"></div></div>
+                                </div>
+                                <div class="stat-vals">
+                                    <span id="compare-deg-a-val">0</span>
+                                    <span id="compare-deg-b-val">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+    <script src="app.js?v=36"></script>
+</body>
+</html>

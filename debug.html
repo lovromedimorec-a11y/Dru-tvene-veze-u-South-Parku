@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JSON Debugger</title>
+</head>
+<body>
+    <h1>South Park Character JSON Debugger</h1>
+    <div id="output" style="white-space: pre-wrap; font-family: monospace;">Loading...</div>
+    <script>
+        const targets = ["Chef", "Lola", "Alejandro", "Flo Kimble", "Kanye West", "Kayne West"];
+        fetch('characters_network.json?v=' + Date.now())
+            .then(r => r.json())
+            .then(data => {
+                const results = data.filter(c => targets.some(t => c.name.toLowerCase().includes(t.toLowerCase())));
+                document.getElementById('output').textContent = JSON.stringify(results, null, 2);
+            })
+            .catch(err => {
+                document.getElementById('output').textContent = "Error: " + err;
+            });
+    </script>
+</body>
+</html>
