@@ -1,6 +1,6 @@
 # Znanstveno izvješće: Analiza socijalne mreže likova serije South Park (Social Network Analysis - SNA)
 
-Ovo znanstveno izvješće prikazuje rezultate analize socijalne strukture i odnosa među likovima u animiranoj seriji *South Park* primjenom metodologije analize socijalnih mreža (SNA). Mreža se sastoji od **64 ključna lika** i **221 jedinstvene društvene veze**, kategorizirane u pet različitih tipova odnosa.
+Ovo znanstveno izvješće prikazuje rezultate analize socijalne strukture i odnosa među likovima u animiranoj seriji *South Park* primjenom metodologije analize socijalnih mreža (SNA). Mreža se sastoji od **64 ključna lika** i **395 jedinstvenih društvenih veza** (odnosno **237** ako izuzmemo školske administrativne interakcije), kategoriziranih u šest različitih tipova odnosa.
 
 ---
 
@@ -21,7 +21,7 @@ Podaci su prikupljeni automatskim pretraživanjem infokutija (infoboxes) na port
 3. **Povezivanje razreda (Classmate Clique)**: Svi učenici četvrtog razreda (18 učenika, uključujući Timmyja i Jimmyja) povezani su međusobnim prijateljskim vezama (**Friend**), osim u slučajevima kada između njih već postoji specifičniji odnos poput neprijateljstva (**Enemy** - npr. Cartman i Kyle) ili ljubavne veze (**Romance** - npr. Stan i Wendy, Craig i Tweek).
 
 ### 2.2. Tipologija odnosa
-Društveni odnosi podijeljeni su u pet međusobno isključivih kategorija visoke preciznosti:
+Društveni odnosi podijeljeni su u šest međusobno isključivih kategorija visoke preciznosti:
 *   **Obitelj (Family)** (Zelena): Izravne obiteljske i rodbinske veze (roditelji, braća, sestre).
 *   **Romantika (Romance)** (Roza): Trenutne ili bivše ljubavne i partnerske veze.
 *   **Prijatelj (Friend)** (Plava): Prijateljski odnosi i vršnjačke veze (razred).
